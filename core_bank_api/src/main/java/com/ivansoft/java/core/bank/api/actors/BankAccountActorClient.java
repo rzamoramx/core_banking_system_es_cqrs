@@ -16,10 +16,23 @@ public class BankAccountActorClient {
 
         try (ActorClient client = new ActorClient()) {
             ActorProxyBuilder<BankAccountActor> builder = new ActorProxyBuilder<>(BankAccountActor.class, client);
+            log.info("actor id: " + accountId);
             ActorId actorId = new ActorId(accountId);
+            log.info("building actor: " + actorId);
             BankAccountActor bankAccountActor = builder.build(actorId);
-
-            return bankAccountActor.transaction(new TransactionDetails(type, amount)).block();
+            log.info("actor built: " + bankAccountActor.toString());
+            var result = bankAccountActor.transaction(new TransactionDetails(type, amount)).block();
+            if (result == null) {
+                return "Transaction return null";
+            } else if (result == 0) {
+                return "Transaction successful";
+            } else if (result == 1) {
+                return "Invalid transaction type";
+            } else if (result == 2) {
+                return "Insufficient funds";
+            } else if (result == 3) {
+                return "Invalid amount";
+            } else return String.format("Unknown error: %d", result);
         } catch (Exception e) {
             return e.getMessage();
         }

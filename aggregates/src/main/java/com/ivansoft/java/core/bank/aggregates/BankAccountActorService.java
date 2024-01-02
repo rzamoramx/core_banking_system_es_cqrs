@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import java.time.Duration;
+import java.util.logging.Logger;
 
 /**
  * Service for Actor runtime.
@@ -17,6 +18,8 @@ import java.time.Duration;
  * dapr run --app-id bankaccountactorservice --app-port 3000 -- java -jar target/bank_account_aggregate-0.0.1-SNAPSHOT.jar com.ivansoft.java.core.bank.aggregates.BankAccountActorService -p 3000
  */
 public class BankAccountActorService {
+    private static final Logger log = Logger.getLogger(BankAccountActorService.class.getName());
+
     public static void main(String[] args) throws Exception {
         Options options = new Options();
         options.addRequiredOption("p", "port", true, "Port the will listen to.");
@@ -37,6 +40,7 @@ public class BankAccountActorService {
         ActorRuntime.getInstance().getConfig().setDrainBalancedActors(true);
 
         // Register the Actor class.
+        log.info("Registering actor type: " + BankAccountActorImpl.class.getName());
         ActorRuntime.getInstance().registerActor(BankAccountActorImpl.class);
 
         // Start Dapr's callback endpoint.

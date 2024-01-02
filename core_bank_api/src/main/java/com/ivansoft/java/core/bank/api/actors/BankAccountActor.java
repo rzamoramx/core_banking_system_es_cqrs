@@ -5,8 +5,8 @@ import io.dapr.actors.ActorType;
 import reactor.core.publisher.Mono;
 
 
-@ActorType(name = "bankaccount")
+@ActorType(name = "BankAccountActor")
 public interface BankAccountActor {
-    @ActorMethod(name = "transaction", returns = String.class)
-    Mono<String> transaction(TransactionDetails transactionDetails);
+    @ActorMethod(name = "transaction", returns = Integer.class)
+    Mono<Integer> transaction(TransactionDetails transactionDetails);
 }

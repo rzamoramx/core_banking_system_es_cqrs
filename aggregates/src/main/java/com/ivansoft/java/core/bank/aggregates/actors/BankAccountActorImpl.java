@@ -6,19 +6,26 @@ import io.dapr.actors.runtime.ActorRuntimeContext;
 import reactor.core.publisher.Mono;
 import com.ivansoft.java.core.bank.aggregates.models.TransactionType;
 
+import java.util.logging.Logger;
+
 
 public class BankAccountActorImpl extends AbstractActor implements BankAccountActor {
+    private static final Logger log = Logger.getLogger(BankAccountActorImpl.class.getName());
+
     public BankAccountActorImpl(ActorRuntimeContext runtimeContext, ActorId id) {
         super(runtimeContext, id);
     }
 
     @Override
-    public Mono<String> transaction(TransactionDetails transactionDetails) {
+    public Mono<Integer> transaction(TransactionDetails transactionDetails) {
+        log.info(String.format("DDDDDDDDD Creating transaction for account %s with type %s and amount %f",
+                super.getId().toString(), transactionDetails.getType().toString(), transactionDetails.getAmount()));
+
         if (transactionDetails.getAmount() > 0) {
             // if type is not deposit or withdraw, return error
             if (!transactionDetails.getType().equals(TransactionType.DEPOSIT) &&
                     !transactionDetails.getType().equals(TransactionType.WITHDRAWAL)) {
-                return Mono.just("Invalid transaction type");
+                return Mono.just(1); // invalid transaction type
             }
 
             // get state manager
@@ -34,15 +41,23 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
                 balance += transactionDetails.getAmount();
             } else if (transactionDetails.getType().equals(TransactionType.WITHDRAWAL)) {
                 if (balance < transactionDetails.getAmount()) {
-                    return Mono.just("Insufficient funds");
+                    return Mono.just(2); // insufficient funds
                 }
                 balance -= transactionDetails.getAmount();
             }
 
             // save state
             super.getActorStateManager().set("balance", balance).block();
-            return Mono.just("Transaction successful");
+            return Mono.just(0); // all ok
+        } else {
+            return Mono.just(3); // invalid amount
         }
-        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "BankAccountActorImpl{" +
+                "id=" + super.getId() +
+                '}';
     }
 }
