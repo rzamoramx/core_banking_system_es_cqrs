@@ -5,6 +5,7 @@ import io.dapr.actors.runtime.AbstractActor;
 import io.dapr.actors.runtime.ActorRuntimeContext;
 import reactor.core.publisher.Mono;
 import com.ivansoft.java.core.bank.aggregates.models.TransactionType;
+import java.util.NoSuchElementException;
 
 
 public class BankAccountActorImpl extends AbstractActor implements BankAccountActor {
@@ -21,13 +22,25 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
                 return Mono.just("Invalid transaction type");
             }
 
-            // get state manager
-            var balance = super.getActorStateManager().get("balance", Double.class).block();
-
-            // if no state, set initial balance
-            if (balance == null) {
-                balance = 0.0;
+            // check if state balance exists
+            if (super.getActorStateManager() == null) {
+                return Mono.just("State manager not found");
             }
+
+            var balance = 0.0;
+
+            // get state manager
+            try {
+                balance = super.getActorStateManager().get("balance", Double.class).block();
+            }
+            catch (NoSuchElementException e) {
+                // if no state balance, set one
+                System.out.println("No balance found, setting to 0");
+                super.getActorStateManager().set("balance", balance).block();
+            }
+
+            // for debug, print actual balance
+            System.out.println("Actual balance: " + transactionDetails.getAmount());
 
             // dependent on transaction type, add or subtract amount from balance if balance is sufficient
             if (transactionDetails.getType().equals(TransactionType.DEPOSIT)) {
@@ -41,6 +54,9 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
 
             // save state
             super.getActorStateManager().set("balance", balance).block();
+            balance = super.getActorStateManager().get("balance", Double.class).block();
+            System.out.println("New balance: " + balance);
+            super.getActorStateManager().save().block();
             return Mono.just("Transaction successful");
         }
         return null;
