@@ -1,6 +1,6 @@
 package com.ivansoft.java.core.bank.aggregates.actors;
 
-import com.ivansoft.java.core.bank.aggregates.models.TransactionType;
+import com.ivansoft.core.bank.account.models.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
