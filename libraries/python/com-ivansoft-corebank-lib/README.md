@@ -1,0 +1,1 @@
+# Core bank system common library for Python projects

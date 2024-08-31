@@ -24,9 +24,10 @@ public class EventSourceService {
             cloudEvent.setId(UUID.randomUUID().toString());
             cloudEvent.setType("com.ivansoft.java.core.bank.transactions.v1");
             cloudEvent.setSpecversion("1");
-            cloudEvent.setDatacontenttype("application/octet-stream");
+            cloudEvent.setDatacontenttype("application/application/json"); // octet-stream
 
-            cloudEvent.setData(Utils.serializeTransactions(transaction));
+            //cloudEvent.setData(Utils.serializeTransactions(transaction));
+            cloudEvent.setData(transaction.convertToJson());
 
             // Publishing messages
             var publishEventRequest = new PublishEventRequest(PUBSUB_NAME, TOPIC_NAME, cloudEvent)

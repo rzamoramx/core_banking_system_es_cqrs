@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "com-ivansoft-corebank-lib"
+version = "0.1.46"
+description = ""
+authors = ["Rodrigo Zamora"]
+readme = "README.md"
+packages = [{include = "com_ivansoft_corebank_lib"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic = "^2.8.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

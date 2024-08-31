@@ -7,6 +7,8 @@ import io.dapr.actors.runtime.AbstractActor;
 import io.dapr.actors.runtime.ActorRuntimeContext;
 import reactor.core.publisher.Mono;
 import com.ivansoft.core.bank.account.models.TransactionType;
+
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -65,7 +67,8 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
                         transactionDetails.getAmount(),
                         transactionDetails.getType(),
                         "completed",
-                        "Transaction completed"
+                        "Transaction completed",
+                        new Date()
                 ));
             } catch (Exception e) {
                 log.severe("Error publishing transaction");
