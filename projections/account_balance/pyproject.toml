@@ -14,6 +14,8 @@ dapr-ext-fastapi = "^1.14.0"
 pydantic = "^2.8.2"
 com-ivansoft-corebank-lib = {path = "../../libraries/python/com-ivansoft-corebank-lib"}
 cloudevents = "^1.11.0"
+structlog = "^24.4.0"
+motor = "^3.5.1"
 
 [build-system]
 requires = ["poetry-core"]

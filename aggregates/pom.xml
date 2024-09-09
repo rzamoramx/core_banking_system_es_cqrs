@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>com.ivansoft.core.bank</groupId>
 			<artifactId>common_lib</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 		</dependency>
 
 	</dependencies>

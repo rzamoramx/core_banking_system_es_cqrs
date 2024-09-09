@@ -16,6 +16,7 @@ public class Transaction {
     private String status;
     private String description;
     private Date timestamp;
+    private int version;
 
     public String convertToJson() {
         return "{"
@@ -26,6 +27,7 @@ public class Transaction {
                 + "\"status\":\"" + status + "\","
                 + "\"description\":\"" + description + "\","
                 + "\"timestamp\":\"" + timestamp + "\""
+                + "\"version\":" + version
                 + "}";
     }
 }

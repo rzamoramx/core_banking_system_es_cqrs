@@ -1,0 +1,7 @@
+
+MONGO_URL = 'mongodb://localhost:27017/'
+MONGO_DB_NAME = 'mydb'
+MONGO_BALANCE_COLLECTION = 'balance'
+MONGO_USER_COLLECTION = 'user'
+MONGO_TRANSACTION_COLLECTION = 'transaction'
+MONGO_ACCOUNT_COLLECTION = 'account'

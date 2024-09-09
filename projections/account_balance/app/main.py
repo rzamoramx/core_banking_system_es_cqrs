@@ -1,14 +1,12 @@
 import json
 from fastapi import FastAPI, Response
-from app.api.routes.v1.transactions import router as transactions_router
 from app.api.eventsource.v1.transaction_subscriber import router as transaction_subscriber_handler
 
 app = FastAPI()
 # Include routers
 app.include_router(transaction_subscriber_handler, prefix="/projectionclientsapi/subscriber/v1")
-app.include_router(transactions_router, prefix="/api/v1")
 
-# Register Dapr pub/sub subscriptions for this projection (cqrs) app
+# Register Dapr pub/sub subscriptions for this projection(pattern) app, in context of CQRS pattern
 # this endpoint is called by Dapr runtime to get the list of topics to subscribe to
 @app.get('/dapr/subscribe')
 def subscribe():

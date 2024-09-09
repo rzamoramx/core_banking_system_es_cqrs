@@ -18,7 +18,7 @@ class Transaction(BaseModel):
     status: str
     description: str
     timestamp: datetime
-
+    version: int
 
     @field_validator('timestamp', mode='before')
     @classmethod

@@ -1,8 +1,10 @@
-
+import asyncio
 import json
 from fastapi import APIRouter
 from app.api.schemas.CloudEventModel import CloudEventModel
 from com_ivansoft_corebank_lib.models.Transaction import Transaction
+from decimal import Decimal
+from app.services.BalanceService import BalanceService
 
 router = APIRouter()
 
@@ -13,5 +15,11 @@ def transaction_handler(event: CloudEventModel):
     transaction = Transaction(**json.loads(event.data))
 
     print(f'Transaction received: {transaction}')
+
+    # convert float to Decimal
+    amount = Decimal(transaction.amount)
+
+    # update the balance
+    asyncio.run(BalanceService().update_balance(transaction.account_id, amount, transaction.transaction_type))
 
     return {"message": "Transaction received successfully"}
