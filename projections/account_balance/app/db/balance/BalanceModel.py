@@ -5,7 +5,7 @@ from decimal import Decimal
 
 class BalanceModel(BaseModel):
     balance: Decimal
-    currency: str
+    currency: str = 'MXN'
     user_id: int
     username: str
     account_id: str

@@ -20,6 +20,6 @@ def transaction_handler(event: CloudEventModel):
     amount = Decimal(transaction.amount)
 
     # update the balance
-    asyncio.run(BalanceService().update_balance(transaction.account_id, amount, transaction.transaction_type))
+    asyncio.run(BalanceService().update_balance(transaction.account_id, amount, transaction.type))
 
     return {"message": "Transaction received successfully"}

@@ -22,9 +22,9 @@ public class EventSourceService {
         try (DaprClient client = new DaprClientBuilder().build()) {
             CloudEvent<String> cloudEvent = new CloudEvent<>();
             cloudEvent.setId(UUID.randomUUID().toString());
-            cloudEvent.setType("com.ivansoft.java.core.bank.transactions.v1");
+            cloudEvent.setType("transaction.v1");
             cloudEvent.setSpecversion("1");
-            cloudEvent.setDatacontenttype("application/application/json"); // octet-stream
+            cloudEvent.setDatacontenttype("application/json"); // octet-stream
 
             //cloudEvent.setData(Utils.serializeTransactions(transaction));
             cloudEvent.setData(transaction.convertToJson());

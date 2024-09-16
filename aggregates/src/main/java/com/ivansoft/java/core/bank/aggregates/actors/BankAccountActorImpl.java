@@ -28,35 +28,29 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
 
     @Override
     public Mono<String> transaction(TransactionDetails transactionDetails) {
-        var errors = validations(transactionDetails);
-        if (errors != null) {
-            return Mono.just(errors);
+        return Mono.just(transactionDetails)
+                .flatMap(this::validate)
+                .flatMap(details -> Mono.fromCallable(this::getCurrentBalanceOrCreate)
+                        .flatMap(currentBalance -> {
+                            Double newBalance = calculateNewBalance(currentBalance, details);
+                            return publishEventWithRetry(details)
+                                    .flatMap(published -> {
+                                        if (!published) {
+                                            return Mono.error(new RuntimeException("Failed to publish event"));
+                                        }
+                                        return saveNewBalance(newBalance);
+                                    })
+                                    .thenReturn("Transaction completed");
+                        }))
+                .onErrorResume(e -> Mono.just("Transaction failed: " + e.getMessage()));
+    }
+
+    private Mono<TransactionDetails> validate(TransactionDetails details) {
+        String error = validations(details);
+        if (error != null) {
+            return Mono.error(new IllegalArgumentException(error));
         }
-
-        return Mono.fromCallable(() -> {
-            Double currentBalance = getCurrentBalance();
-            log.info("Current balance: " + currentBalance);
-
-            Double newBalance = calculateNewBalance(currentBalance, transactionDetails);
-
-            return new Object[]{currentBalance, newBalance};
-        })
-        .flatMap(balances -> {
-            Double currentBalance = (Double) balances[0];
-            Double newBalance = (Double) balances[1];
-
-            return publishEventWithRetry(transactionDetails)
-                .flatMap(published -> {
-                    if (published) {
-                        return saveNewBalance(newBalance)
-                           .then(Mono.just("Transaction successful. New balance: " + newBalance))
-                           .onErrorResume(e -> Mono.just("Transaction failed: Unable to save new balance. Balance unchanged: " + currentBalance));
-                    } else {
-                        log.severe("Failed to publish event. Transaction cancelled.");
-                        return Mono.just("Transaction failed: Unable to publish event. Balance unchanged: " + currentBalance);
-                    }
-                });
-        }).onErrorResume(e -> Mono.just("Error: " + e.getMessage()));
+        return Mono.just(details);
     }
 
     private String validations(TransactionDetails transactionDetails) {
@@ -77,12 +71,6 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
         }
 
         return null;
-    }
-
-    private double getCurrentBalance() {
-        return Optional.ofNullable(super.getActorStateManager()
-                .get(STATE_NAME, Double.class).block())
-                .orElse(0.0);
     }
 
     private Mono<Object> saveNewBalance(Double newBalance) {
@@ -138,5 +126,17 @@ public class BankAccountActorImpl extends AbstractActor implements BankAccountAc
               log.severe("Failed to publish event after " + MAX_RETRIES + " attempts: " + e.getMessage());
               return Mono.just(false);
         });
+    }
+
+    private Double getCurrentBalanceOrCreate() {
+        try {
+            return super.getActorStateManager().get(STATE_NAME, Double.class).block();
+        }
+        catch (Exception e) {
+            log.info("Balance not found. Creating new balance");
+            double initialBalance = 0.0;
+            saveNewBalance(initialBalance);
+            return initialBalance;
+        }
     }
 }

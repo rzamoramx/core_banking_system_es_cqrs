@@ -19,6 +19,7 @@
 		<dapr.sdk.version>1.12.0</dapr.sdk.version>
 		<lombok.version>1.18.30</lombok.version>
 		<commons.cli.version>1.6.0</commons.cli.version>
+		<core.bank.version>1.0.5</core.bank.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -67,7 +68,7 @@
 		<dependency>
 			<groupId>com.ivansoft.core.bank</groupId>
 			<artifactId>common_lib</artifactId>
-			<version>1.0.3</version>
+			<version>${core.bank.version}</version>
 		</dependency>
 
 	</dependencies>

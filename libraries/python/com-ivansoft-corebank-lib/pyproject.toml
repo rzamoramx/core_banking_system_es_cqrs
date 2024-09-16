@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "com-ivansoft-corebank-lib"
-version = "0.1.47"
+version = "0.1.48"
 description = ""
 authors = ["Rodrigo Zamora"]
 readme = "README.md"

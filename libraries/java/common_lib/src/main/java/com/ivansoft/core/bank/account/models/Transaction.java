@@ -21,12 +21,12 @@ public class Transaction {
     public String convertToJson() {
         return "{"
                 + "\"id\":\"" + id + "\","
-                + "\"accountId\":\"" + accountId + "\","
+                + "\"account_id\":\"" + accountId + "\","
                 + "\"amount\":" + amount + ","
                 + "\"type\":\"" + type + "\","
                 + "\"status\":\"" + status + "\","
                 + "\"description\":\"" + description + "\","
-                + "\"timestamp\":\"" + timestamp + "\""
+                + "\"timestamp\":\"" + timestamp + "\","
                 + "\"version\":" + version
                 + "}";
     }

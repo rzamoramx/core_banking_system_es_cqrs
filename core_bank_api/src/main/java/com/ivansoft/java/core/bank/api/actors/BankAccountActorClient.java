@@ -19,6 +19,7 @@ public class BankAccountActorClient {
             ActorId actorId = new ActorId(accountId);
             BankAccountActor bankAccountActor = builder.build(actorId);
 
+            // todo: use reactor to handle async and avoid blocking
             return bankAccountActor.transaction(new TransactionDetails(type, amount)).block();
         } catch (Exception e) {
             return e.getMessage();

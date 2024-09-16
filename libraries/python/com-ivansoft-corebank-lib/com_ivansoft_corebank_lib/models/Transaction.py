@@ -12,7 +12,7 @@ class TransactionType(str, Enum):
 
 class Transaction(BaseModel):
     id: str
-    accountId: str
+    account_id: str
     amount: float
     type: TransactionType
     status: str

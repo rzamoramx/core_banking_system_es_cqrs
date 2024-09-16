@@ -23,8 +23,8 @@ class BalanceService:
         # retrieve previous balance of this account
         previous_balance = await self.balance_repository.get(account_id)
 
-        # we can retrieve data from other collections here
-        user = await self.user_repository.get_by_account_id(account_id)
+        # we can retrieve data from other collections here, this is not implemented in this example
+        user = self.user_repository.get_by_account_id(account_id)
 
         if not user:
             raise ValueError(f'User for account {account_id} not found')
@@ -33,7 +33,7 @@ class BalanceService:
                                account_id=account_id,
                                user_id=user.user_id,
                                username=user.username)
-
+        # TODO check why this is not working
         if not previous_balance:
             # set the created_at time, this is the first time this account is being updated
             balance.created_at = datetime.now()
