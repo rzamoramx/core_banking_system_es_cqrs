@@ -16,6 +16,8 @@ com-ivansoft-corebank-lib = {path = "../../libraries/python/com-ivansoft-coreban
 cloudevents = "^1.11.0"
 structlog = "^24.4.0"
 motor = "^3.5.1"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
 
 [build-system]
 requires = ["poetry-core"]

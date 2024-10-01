@@ -1,6 +1,7 @@
 
 from pydantic import BaseModel
 from decimal import Decimal
+from typing import Optional
 
 
 class BalanceModel(BaseModel):
@@ -10,5 +11,10 @@ class BalanceModel(BaseModel):
     username: str
     account_id: str
     # optional fields
-    created_at: str = None
-    updated_at: str = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+    class Config:
+        json_encoders = {
+            Decimal: lambda v: str(v)
+        }

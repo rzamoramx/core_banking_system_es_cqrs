@@ -30,12 +30,12 @@ func main() {
 	flag.Parse()
 
 	// Create a Dapr client
-	client, err := dapr.NewClient()
+	/*client, err := dapr.NewClient()
 	if err != nil {
 		log.Printf("Failed to create Dapr client: %v", err)
 		os.Exit(1)
 	}
-	defer client.Close()
+	defer client.Close()*/
 
 	r := mux.NewRouter()
 
@@ -44,7 +44,7 @@ func main() {
 	r.HandleFunc("/dapr/subscribe", toSubscribe).Methods("GET")
 
 	// Dapr subscription routes transactions topic to this route
-	r.HandleFunc("/transactions/subscriber/v1/handler", eventHandler(client, context.Background())).Methods("POST")
+	r.HandleFunc("/transactions/subscriber/v1/handler", eventHandler(context.Background())).Methods("POST")
 
 	// Start the server; this is a blocking call
 	log.Printf("Starting server on port %s", *appPort)
@@ -70,8 +70,15 @@ func recoverMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func eventHandler(client dapr.Client, ctx context.Context) http.HandlerFunc {
+func eventHandler(ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		client, err := dapr.NewClient()
+		if err != nil {
+			log.Printf("Failed to create Dapr client: %v", err)
+			os.Exit(1)
+		}
+		defer client.Close()
+
 		data, err := io.ReadAll(r.Body)
 		if err != nil {
 			log.Printf("Error: reading request body: %v", err)
@@ -129,9 +136,6 @@ func eventHandler(client dapr.Client, ctx context.Context) http.HandlerFunc {
 			return
 		}
 		log.Printf("Event saved retrieved: %s\n", string(resp.Value))
-
-		// print accountID as byte
-		log.Printf("AccountID: %s\n", accountId)
 
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write([]byte("Event saved")); err != nil {

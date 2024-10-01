@@ -13,38 +13,51 @@ class BalanceService:
         self.balance_repository = BalanceRepository()
         self.user_repository = UserRepository()
 
-    async def get_balance(self, account_id: str) -> BalanceModel:
+    async def get_history_balance(self, account_id: str):
+        history = await self.balance_repository.get_history(account_id)
+        return history
+
+    async def get_current_balance(self, account_id: str) -> BalanceModel:
         balance = await self.balance_repository.get(account_id)
         if not balance:
             raise ValueError(f'Balance for account {account_id} not found')
         return balance
 
     async def update_balance(self, account_id: str, amount: Decimal, transaction_type: TransactionType):
-        # retrieve previous balance of this account
         previous_balance = await self.balance_repository.get(account_id)
+        user = self._get_user_by_account_id(account_id)
 
-        # we can retrieve data from other collections here, this is not implemented in this example
+        logger.info('previous_balance', previous_balance=previous_balance)
+
+        balance = self._create_balance_model(account_id, amount, user, previous_balance, transaction_type)
+        logger.info('New balance', balance=balance)
+
+        await self.balance_repository.save(balance)
+
+    def _get_user_by_account_id(self, account_id: str):
         user = self.user_repository.get_by_account_id(account_id)
-
         if not user:
             raise ValueError(f'User for account {account_id} not found')
+        return user
 
-        balance = BalanceModel(balance=amount,
-                               account_id=account_id,
-                               user_id=user.user_id,
-                               username=user.username)
-        # TODO check why this is not working
-        if not previous_balance:
-            # set the created_at time, this is the first time this account is being updated
-            balance.created_at = datetime.now()
-        else:
-            # set the created_at time to the previous balance created_at
-            balance.updated_at = datetime.now()
+    def _create_balance_model(self, account_id: str, amount: Decimal, user, previous_balance, transaction_type: TransactionType) -> BalanceModel:
+        balance = BalanceModel(
+            balance=amount,
+            account_id=account_id,
+            user_id=user.user_id,
+            username=user.username,
+            created_at=previous_balance.created_at if previous_balance else datetime.now().isoformat(),
+            updated_at=datetime.now().isoformat() if previous_balance else None
+        )
 
+        if previous_balance:
+            balance.balance = self._calculate_new_balance(previous_balance.balance, amount, transaction_type)
+        return balance
+
+    def _calculate_new_balance(self, previous_amount: Decimal, amount: Decimal, transaction_type: TransactionType) -> Decimal:
         if transaction_type == TransactionType.DEPOSIT:
-            balance.balance += previous_balance.balance
+            return previous_amount + amount
         elif transaction_type == TransactionType.WITHDRAW:
-            balance.balance -= previous_balance.balance
-
-        # update the balance in the database
-        await self.balance_repository.save(balance)
+            return previous_amount - amount
+        else:
+            raise ValueError(f'Invalid transaction type: {transaction_type}')
