@@ -1,4 +1,4 @@
-package com.ivansoft.java.core.bank.api;
+package com.ivansoft.core.bank.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

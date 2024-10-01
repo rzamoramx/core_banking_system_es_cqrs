@@ -8,7 +8,7 @@
 		<version>3.3.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.ivansoft.java.core.bank</groupId>
+	<groupId>com.ivansoft.core.bank</groupId>
 	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>api</name>
@@ -17,6 +17,7 @@
 		<java.version>21</java.version>
 		<dapr.sdk.version>1.12.0</dapr.sdk.version>
 		<lombok.version>1.18.30</lombok.version>
+		<core.bank.version>1.0.5</core.bank.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -49,6 +50,12 @@
 			<groupId>io.dapr</groupId>
 			<artifactId>dapr-sdk-actors</artifactId>
 			<version>${dapr.sdk.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ivansoft.core.bank</groupId>
+			<artifactId>common_lib</artifactId>
+			<version>${core.bank.version}</version>
 		</dependency>
 
 	</dependencies>

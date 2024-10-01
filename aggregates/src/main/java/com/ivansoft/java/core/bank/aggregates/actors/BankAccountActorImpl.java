@@ -10,7 +10,6 @@ import com.ivansoft.core.bank.account.models.TransactionType;
 import reactor.util.retry.Retry;
 import java.time.Duration;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 

@@ -1,4 +1,4 @@
-package com.ivansoft.java.core.bank.api.models;
+package com.ivansoft.core.bank.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

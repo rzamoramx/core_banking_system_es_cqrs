@@ -1,6 +1,6 @@
-package com.ivansoft.java.core.bank.api.actors;
+package com.ivansoft.core.bank.api.actors;
 
-import com.ivansoft.java.core.bank.api.models.TransactionType;
+import com.ivansoft.core.bank.account.models.TransactionType;
 import io.dapr.actors.ActorId;
 import io.dapr.actors.client.ActorClient;
 import io.dapr.actors.client.ActorProxyBuilder;

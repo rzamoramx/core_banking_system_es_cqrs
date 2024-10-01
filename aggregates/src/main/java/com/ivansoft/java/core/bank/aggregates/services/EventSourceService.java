@@ -6,7 +6,6 @@ import io.dapr.client.domain.CloudEvent;
 import io.dapr.client.domain.Metadata;
 import io.dapr.client.domain.PublishEventRequest;
 import com.ivansoft.core.bank.account.models.Transaction;
-import com.ivansoft.core.bank.account.lib.Utils;
 import java.util.UUID;
 import java.util.logging.Logger;
 import static java.util.Collections.singletonMap;

@@ -1,4 +1,4 @@
-package com.ivansoft.java.core.bank.api;
+package com.ivansoft.core.bank.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
