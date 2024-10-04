@@ -1,4 +1,4 @@
-package com.ivansoft.java.core.bank.api.actors;
+package com.ivansoft.core.bank.api.actors;
 
 import io.dapr.actors.ActorMethod;
 import io.dapr.actors.ActorType;

@@ -1,13 +1,13 @@
-package com.ivansoft.java.core.bank.api.controllers;
+package com.ivansoft.core.bank.api.controllers;
 
-import com.ivansoft.java.core.bank.api.models.RequestAccountTransaction;
-import com.ivansoft.java.core.bank.api.models.Response;
+import com.ivansoft.core.bank.api.models.RequestAccountTransaction;
+import com.ivansoft.core.bank.api.models.Response;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.logging.Logger;
-import com.ivansoft.java.core.bank.api.actors.BankAccountActorClient;
+import com.ivansoft.core.bank.api.actors.BankAccountActorClient;
 
 
 @RestController

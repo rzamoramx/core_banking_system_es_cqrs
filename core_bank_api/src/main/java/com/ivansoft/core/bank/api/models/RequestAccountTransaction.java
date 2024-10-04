@@ -1,5 +1,6 @@
-package com.ivansoft.java.core.bank.api.models;
+package com.ivansoft.core.bank.api.models;
 
+import com.ivansoft.core.bank.account.models.TransactionType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
