@@ -49,16 +49,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer client.CloseSession(context.Background())
+	//defer client.CloseSession(context.Background())
 
-	fmt.Println("getting data...")
-	resp, err := Get(context.Background(), &GetRequest{
+	fmt.Println("Setting data...")
+	Set(context.Background(), &SetRequest{
 		Key: "BCD987a",
+		Value: map[string]interface{}{
+			"key1": "value1",
+			"key2": 2,
+			"key3": 3.14,
+		},
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s\n", string(resp.Data))
 }
 
 func Get(ctx context.Context, req *GetRequest) (*GetResponse, error) {
