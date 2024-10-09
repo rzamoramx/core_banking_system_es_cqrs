@@ -33,3 +33,9 @@ build/
 .vscode/
 
 .mvn/
+
+.identity-*
+.state-*
+
+es/.identity-*
+es/.state-*
