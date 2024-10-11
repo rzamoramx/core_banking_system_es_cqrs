@@ -12,11 +12,15 @@ class AccountService:
         self.transaction_repository = TransactionRepository()
 
     async def get_history_transactions(self, account_id: str):
-        history = await self.transaction_repository.get_history(account_id)
-        return history
+        try:
+            history = await self.transaction_repository.get_history(account_id)
+            return history
+        except Exception as e:
+            logger.error('Error getting history transactions', account_id=account_id, error=str(e))
+            raise ValueError('Not Found')
 
     async def get_current_balance(self, account_id: str) -> BalanceModel:
         balance = await self.balance_repository.get(account_id)
         if not balance:
-            raise ValueError(f'Balance for account {account_id} not found')
+            raise ValueError('Not Found')
         return balance

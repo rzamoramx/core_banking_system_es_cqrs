@@ -12,13 +12,13 @@ def get_account_service():
     service = AccountService()
     yield service
 
-"""this endpoint handlers is for programmatic method to subscribe to a topic, check main.py for subscription"""
+"""this endpoint handlers is for programmatic method to subscribe to a topic, check main.py for subscription details"""
 
-@router.post('/projection_balance/handler', response_model=None)
-async def balance_handler(event: CloudEventModel, account_service: AccountService = Depends(get_account_service)):
+@router.post('/account_projections/handler', response_model=None)
+async def account_projections_handler(event: CloudEventModel, account_service: AccountService = Depends(get_account_service)):
     transaction = Transaction(**json.loads(event.data))
 
-    print(f'Transaction received: {transaction}')
+    print(f'Start procressing balance projection')
 
     # convert float to Decimal
     amount = Decimal(transaction.amount)
@@ -26,16 +26,9 @@ async def balance_handler(event: CloudEventModel, account_service: AccountServic
     # update the balance
     await account_service.update_balance(transaction.account_id, amount, transaction.type)
 
-    return {"message": "Balance updated successfully"}
-
-
-@router.post('/projection_history/handler', response_model=None)
-async def history_transaction_handler(event: CloudEventModel, account_service: AccountService = Depends(get_account_service)):
-    transaction = Transaction(**json.loads(event.data))
-
-    print(f'Transaction received: {transaction}')
+    print(f'Start procressing transaction history projection')
 
     # save the transaction to history
     await account_service.save_transaction(transaction)
 
-    return {"message": "Transaction saved successfully"}
+    return {"message": "Projections processed successfully"}
