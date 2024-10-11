@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "account-projections"
+name = "account"
 version = "0.1.0"
 description = ""
 authors = ["Rodrigo Zamora (rzamoramx)"]

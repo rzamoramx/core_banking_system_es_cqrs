@@ -1,6 +1,7 @@
 from datetime import datetime
 from com_ivansoft_corebank_lib.models.Transaction import TransactionType
-from app.db.balance.BalanceRepository import BalanceRepository, BalanceModel
+from app.db.balance.BalanceRepository import BalanceRepository
+from com_ivansoft_corebank_lib.models.Balance import Balance as BalanceModel
 from app.db.user.UserRepository import UserRepository
 from app.db.transaction.TransactionRepository import TransactionRepository, TransactionModel
 from decimal import Decimal
@@ -15,18 +16,8 @@ class AccountService:
         self.user_repository = UserRepository()
         self.history_transaction_repository = TransactionRepository()
 
-    async def get_history_balance(self, account_id: str):
-        history = await self.balance_repository.get_history(account_id)
-        return history
-
     async def save_transaction(self, transaction):
         await self.history_transaction_repository.save(transaction)
-
-    async def get_current_balance(self, account_id: str) -> BalanceModel:
-        balance = await self.balance_repository.get(account_id)
-        if not balance:
-            raise ValueError(f'Balance for account {account_id} not found')
-        return balance
 
     async def update_balance(self, account_id: str, amount: Decimal, transaction_type: TransactionType):
         previous_balance = await self.balance_repository.get(account_id)

@@ -17,5 +17,5 @@ async def get_actual_balance(account_id: str, account_service: AccountService = 
 
 @router.get("/account/{account_id}/history")
 async def get_balance_history(account_id: str, account_service: AccountService = Depends(get_account_service)):
-    history = await account_service.get_history_balance(account_id)
+    history = await account_service.get_history_transactions(account_id)
     return [balance.model_dump() for balance in history]

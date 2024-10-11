@@ -1,5 +1,4 @@
-
-from app.db.user.UserModel import UserModel
+from com_ivansoft_corebank_lib.models.User import User as UserModel
 
 
 class UserRepository:

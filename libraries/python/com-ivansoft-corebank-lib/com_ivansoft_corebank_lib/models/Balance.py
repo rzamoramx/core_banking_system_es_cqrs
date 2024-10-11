@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Optional
 
 
-class TransactionModel(BaseModel):
+class Balance(BaseModel):
     balance: Decimal
     currency: str = 'MXN'
     user_id: int
