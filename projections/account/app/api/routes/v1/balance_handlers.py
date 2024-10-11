@@ -1,11 +1,11 @@
 
 from fastapi import APIRouter
-from app.services.BalanceService import BalanceService
+from app.services.AccountService import BalanceService
 
 router = APIRouter()
 
 
-@router.get("/{account_id}/balance/current")
+@router.get("/account/{account_id}/balance")
 async def get_actual_balance(account_id: str):
     balance_service = BalanceService()
     balance = await balance_service.get_current_balance(account_id)

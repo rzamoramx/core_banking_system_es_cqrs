@@ -11,7 +11,7 @@ import com.ivansoft.core.bank.api.actors.BankAccountActorClient;
 
 
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/mybank/api/v1/account")
 public class BankAccountController {
     private static final Logger log = Logger.getLogger(BankAccountController.class.getName());
     private final BankAccountActorClient bankAccountActorClient = new BankAccountActorClient();

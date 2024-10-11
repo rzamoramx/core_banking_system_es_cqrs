@@ -7,7 +7,7 @@ from typing import Any
 
 class TransactionType(str, Enum):
     DEPOSIT = "DEPOSIT"
-    WITHDRAW = "WITHDRAW"
+    WITHDRAW = "WITHDRAWAL"
 
 
 class Transaction(BaseModel):
