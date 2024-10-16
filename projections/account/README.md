@@ -1,40 +1,25 @@
 # Core banking system rest API for clients like mobile apps #
 
-According to CQRS pattern, this API is a projection of the core banking system. Specifically
-this handle reads for clients like mobile apps (transactions, user accounts, etc).
+According to CQRS pattern, this API handle event source messages (transactions) and process 
+them according to balance and transactions history projections.
 
-For transactions, this projection are subscribed to transactions topic of the event sourcing system and store
-the transactions in own database. It exposes a REST API (fastapi) to get transactions by account id.
+Each projection saves the data in its own store
 
 ## Dependencies ##
 
-- Python 3.12 or higher
-- poetry
+- Python 3.12
+- poetry 1.7.1
+- docker 27.2.0
+- dapr 1.14
+
+## Setup ##
 
 Run this command to install dependencies:
 
 ```poetry install```
 
-Also is required to subscribe in a declarative way to a Dapr pubsub component, using scopes in pubsub.yaml file.
-where a scope is an app ID when we run the Dapr app (next section "Run").
-
-```yaml
-apiVersion: dapr.io/v1alpha1
-kind: Component
-metadata:
-  name: transactions
-spec:
-    type: pubsub.redis
-    metadata:
-    - name: redisHost
-        value: "redis://localhost:6379"
-    - name: redisPassword
-        value: ""
-scopes:
-  - clientsapi
-```
-
-
 ## Run ##
 
-```dapr run --app-id clientsapi --resources-path ./myComponents -- python3 app.py```
+```bash
+dapr run --app-id accountprojections --app-port 8000 -- poetry run uvicorn app.main:app --port 8000
+```
