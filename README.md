@@ -165,6 +165,15 @@ You'll need the immuadmin and immuclient binaries, the commands are the same in 
     ```
 
 7- Follow the README instructions in each project subdirectory to set up and run individual components.
+  - For the Core Bank API (Java), follow the instructions in the [core_bank_api/README.md](core_bank_api/README.md).
+
+  - For the Bank Account Actor (Java), follow the instructions in the [aggregates/README.md](aggregates/README.md).
+
+  - For the Event Source (Go), follow the instructions in the [es/README.md](es/README.md).
+
+  - For the Account Projections (Python), follow the instructions in the [projections/account/README.md](projections/account/README.md).
+
+  - For the Queries API (Python), follow the instructions in the [queries_bank_api/README.md](queries_bank_api/README.md).
 
 
 ## Usage ##
@@ -186,7 +195,7 @@ Once all components are up and running, you can perform the following operations
   }
   ```
 
-  And you will see all logs in each component console previously started in the installation section.
+  You will see all components interacting with each other to process the transaction seeing the logs in each console.
 
 2- Check the account balance by sending a GET request to the Queries API:
 
