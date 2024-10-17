@@ -25,7 +25,7 @@ This project demonstrates a simple core banking system that implements Event Sou
 The system is built on Dapr (Distributed Application Runtime), showcasing how to leverage its components for building robust, scalable microservices.
 
 For Dapr's official documentation
- [read here](https://docs.dapr.io/concepts/overview/) is neccesary to understand the whole project.
+ [read here](https://docs.dapr.io/concepts/overview/) is neccesary to read to understand how this project leverages Dapr's building blocks.
 
 ## Architecture ##
 
@@ -144,7 +144,27 @@ You'll need the immuadmin and immuclient binaries, the commands are the same in 
 ./immuclient use eventstoredb
 ```
 
-5- Follow the README instructions in each project subdirectory to set up and run individual components.
+5- Create DB in mongodb:
+  
+  Create "mydb" database in mongo and "balance" and "transactions" collections. You can use a GUI like MongoDB Compass or a command line tool like mongo shell.
+
+6- Setup shared code libraries:
+
+ - Java:
+    localate into libraries/java and execute the following command:
+  
+    ``` bash
+    mvn clean install
+    ```
+
+  - Python:
+    localate into libraries/python and execute the following command:
+  
+    ``` bash
+    poetry install
+    ```
+
+7- Follow the README instructions in each project subdirectory to set up and run individual components.
 
 
 ## Usage ##
@@ -152,10 +172,76 @@ You'll need the immuadmin and immuclient binaries, the commands are the same in 
 Once all components are up and running, you can perform the following operations:
 
 1- Start a command operation by sending a POST request to the Core Bank API:
+  
+  ``` bash
+  curl -X POST http://localhost:8081/mybank/api/v1/account/transaction   -H "Content-Type: application/json" -d '{"account_id": "1234", "amount": 100.00, "transaction_type": "DEPOSIT"}'
+  ```
+
+  Response:
+  ``` json
+  {
+	"status": "OK",
+	"message": "Transaction created",
+	"data": null
+  }
+  ```
+
+  And you will see all logs in each component console previously started in the installation section.
 
 2- Check the account balance by sending a GET request to the Queries API:
 
+  ``` bash
+  curl -X GET http://localhost:8003/mybank/api/v1/account/:accountid/balance
+  ```
+
+  Where :accountid is the account id you used in the previous request.
+
+  Response:
+  ``` json
+  {
+	"balance": 550,
+	"currency": "MXN",
+	"user_id": 1,
+	"username": "test_user",
+	"account_id": "A0003",
+	"created_at": "2024-10-11T08:15:09.776613",
+	"updated_at": "2024-10-11T08:16:14.187731"
+  }
+  ```
+
 3- Check the account transaction history by sending a GET request to the Queries API:
+
+  ``` bash
+  curl -X GET http://localhost:8003/mybank/api/v1/account/:accountid/history
+  ```
+
+  Where :accountid is the account id you used in the previous request.
+
+  Response:
+  ``` json
+  [
+	{
+		"id": "362c0b08-ee9f-4157-b0ea-9fbfc275ba88",
+		"account_id": "A0003",
+		"amount": 50.0,
+		"type": "DEPOSIT",
+		"status": "completed",
+		"description": "Transaction completed",
+		"timestamp": "2024-10-11T08:15:09",
+		"version": 1
+	},
+	{
+		"id": "500cbafd-f69f-40fa-95cf-d69e51e4ea64",
+		"account_id": "A0003",
+		"amount": 500.0,
+		"type": "DEPOSIT",
+		"status": "completed",
+		"description": "Transaction completed",
+		"timestamp": "2024-10-11T08:16:14",
+		"version": 1
+	}
+  ]
+  ```
 
 ## Technologies Used ##
 
