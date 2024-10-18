@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "account"
+version = "0.1.0"
+description = ""
+authors = ["Rodrigo Zamora (rzamoramx)"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.112.2"
+uvicorn = "^0.30.6"
+dapr-ext-fastapi = "^1.14.0"
+pydantic = "^2.8.2"
+com-ivansoft-corebank-lib = {path = "../../libraries/python/com-ivansoft-corebank-lib"}
+cloudevents = "^1.11.0"
+structlog = "^24.4.0"
+motor = "^3.5.1"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

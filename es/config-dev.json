@@ -1,0 +1,9 @@
+{
+    "immudb": {
+        "host": "localhost",
+        "port": 3322,
+        "user": "immudb",
+        "password": "immudb1",
+        "database": "eventsourcedb"
+    }
+}
