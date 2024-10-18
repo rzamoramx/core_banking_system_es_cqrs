@@ -1,11 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"runtime/debug"
+	"strconv"
 
 	"github.com/gorilla/mux"
 
@@ -13,7 +17,22 @@ import (
 	"ivansoft.com/corebank/eventsource/store/handlers"
 )
 
+type Config struct {
+	Immudb struct {
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+		User     string `json:"user"`
+		Password string `json:"password"`
+		Database string `json:"database"`
+	} `json:"immudb"`
+}
+
 func main() {
+	// Load configuration and set environment variables
+	if err := loadConfigToEnv(); err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
+
 	// Define a command-line flag for the port
 	appPort := flag.String("port", "6005", "Port for the application to listen on")
 	flag.Parse()
@@ -62,11 +81,61 @@ func recoverMiddleware(next http.Handler) http.Handler {
 }
 
 func createDbClient() (*db.Immudb, error) {
-	// TODO: retrieve host, port, user, password, and database from env file
+	host := os.Getenv("IMMUDB_HOST")
+	port, _ := strconv.Atoi(os.Getenv("IMMUDB_PORT"))
+	user := os.Getenv("IMMUDB_USER")
+	password := os.Getenv("IMMUDB_PASSWORD")
+	database := os.Getenv("IMMUDB_DATABASE")
 
-	immudbClient, err := db.NewImmudb("localhost", 3322, "immudb", "immudb1", "eventsourcedb")
+	immudbClient, err := db.NewImmudb(host, port, user, password, database)
 	if err != nil {
-		log.Fatalf("Failed to create Immudb client: %v", err)
+		return nil, err
 	}
+
+	log.Printf("Successfully connected to Immudb at %s:%d", host, port)
 	return immudbClient, nil
+}
+
+func loadConfig() (*Config, error) {
+	file, err := os.Open("config-dev.json")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var config Config
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+func loadConfigToEnv() error {
+	if os.Getenv("ENV") == "dev" {
+		config, err := loadConfig()
+		if err != nil {
+			return fmt.Errorf("failed to load config: %w", err)
+		}
+
+		os.Setenv("IMMUDB_HOST", config.Immudb.Host)
+		os.Setenv("IMMUDB_PORT", strconv.Itoa(config.Immudb.Port))
+		os.Setenv("IMMUDB_USER", config.Immudb.User)
+		os.Setenv("IMMUDB_PASSWORD", config.Immudb.Password)
+		os.Setenv("IMMUDB_DATABASE", config.Immudb.Database)
+
+		log.Println("Configuration loaded from config.json into environment variables")
+	} else {
+		requiredEnvVars := []string{"IMMUDB_HOST", "IMMUDB_PORT", "IMMUDB_USER", "IMMUDB_PASSWORD", "IMMUDB_DATABASE"}
+		for _, envVar := range requiredEnvVars {
+			if os.Getenv(envVar) == "" {
+				return fmt.Errorf("required environment variable %s is not set", envVar)
+			}
+		}
+		log.Println("Using existing environment variables for configuration")
+	}
+
+	return nil
 }

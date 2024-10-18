@@ -8,7 +8,7 @@ def get_account_service():
     yield service
 
 @router.get("/account/{account_id}/balance")
-async def get_actual_balance(account_id: str, account_service: AccountService = Depends(get_account_service)):
+async def get_balance(account_id: str, account_service: AccountService = Depends(get_account_service)):
     try:
         balance = await account_service.get_current_balance(account_id)
         return balance.model_dump()
@@ -18,7 +18,7 @@ async def get_actual_balance(account_id: str, account_service: AccountService = 
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/account/{account_id}/history")
-async def get_balance_history(account_id: str, account_service: AccountService = Depends(get_account_service)):
+async def get_transaction_history(account_id: str, account_service: AccountService = Depends(get_account_service)):
     try:
         history = await account_service.get_history_transactions(account_id)
         return [balance.model_dump() for balance in history]

@@ -1,274 +1,266 @@
-# core_banking_system_es_cqrs
+# Core Banking System (ES-CQRS)
 
-An experimental core banking system using Event Sourcing (ES) and Command Query Responsibility Segregation (CQRS) using Dapr, Python, Java, and Go.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Use Dapr](https://img.shields.io/badge/Use%20-Dapr-blue.svg)](https://dapr.io/)
 
-## Table of Contents
+A modern, experimental core banking system implementing Event Sourcing (ES) and Command Query Responsibility Segregation (CQRS) patterns. Built with Dapr, Python, Java, and Go.
 
-- Overview
-- Architecture
-    - Logical Architecture
-    - Physical Architecture
-- Project Structure
-- Getting Started
-    - Prerequisites
-    - Installation
-- Usage
-- Technologies Used
-- Contributing
-- License
-- Acknowledgments
+This project demonstrates a simplified core banking system that leverages Event Sourcing and CQRS patterns. It handles essential bank account operations such as deposits and withdrawals, while exposing separate REST APIs for commands and queries. The system is built on Dapr (Distributed Application Runtime), showcasing how to use its components to build robust, scalable microservices.
 
-## Overview ##
-> **_NOTE:_** This project is inspired by the blog series [A Core banking System Architecture](https://sites.google.com/view/rodrigozamora/blog/arquitectura-para-un-core-banking-system?authuser=0) (in Spanish).
+> **_NOTE:_** For Dapr's official documentation
+ [read here](https://docs.dapr.io/concepts/overview/) to understand how this project leverages Dapr's building blocks.
 
-This project demonstrates a simple core banking system that implements Event Sourcing, CQRS, Aggregates, and Projections patterns. It handles basic bank account operations such as deposits and withdrawals, exposing two REST APIs: one for commands and another for queries.
-The system is built on Dapr (Distributed Application Runtime), showcasing how to leverage its components for building robust, scalable microservices.
+ > **_NOTE:_** This project is based on the blog post [A Core banking System Architecture](https://sites.google.com/view/rodrigozamora/blog/arquitectura-para-un-core-banking-system?authuser=0) (in Spanish).
 
-For Dapr's official documentation
- [read here](https://docs.dapr.io/concepts/overview/) is neccesary to read to understand how this project leverages Dapr's building blocks.
+## 🌟 Features
 
-## Architecture ##
+- Event Sourcing architecture for reliable transaction history
+- CQRS pattern implementation for optimized read/write operations
+- Microservices-based architecture using Dapr building blocks
+- Real-time transaction processing
+- Separate command and query APIs
+- Immutable event log storage
+- Scalable projection system for account views
 
-### Logical architecture ###
+## 🏗️ Architecture
 
-The system comprises the following high-level components:
+### Logical Architecture
 
-- Commands: Utilizes the Aggregate pattern for deposit and withdrawal operations, ensuring write consistency with each bank account as an individual aggregate.
-- Queries: Implements the Projection pattern to create "views" of bank account operations, stored separately from the write model.
-- Event Source: Acts as a middleware between commands and queries, receiving events from aggregates and publishing them to consumers (Projections).
-- APIs: Separate APIs for account operations (commands) and reading projections (queries).
+The system is built around these core components:
 
-TODO: [image]
+- **Command Layer**: Implements the Aggregate pattern for atomic banking operations
+  - Handles deposits and withdrawals
+  - Ensures write consistency through individual account aggregates
+  - Validates business rules
 
-### Physical architecture ###
+- **Query Layer**: Uses the Projection pattern for efficient reads
+  - Maintains separate read models
+  - Provides optimized views of account data
+  - Supports balance and transaction history queries
 
-The system is composed of the following components:
+- **Event Source**: Serves as the system's backbone
+  - Manages event flow between commands and queries
+  - Ensures event persistence and distribution
+  - Maintains the source of truth for all transactions
 
-- Core Bank API (Java, Spring Boot): REST API for triggering command operations.
-- Bank Account Actor (Java, Spring Boot): Processes bank account operations atomically using Dapr's Actor building block.
-- Event Source (Go, Gorilla/mux): Handles system events using Dapr's pubsub building block and stores event logs in ImmuDB.
-- Account Projections (Python, FastAPI): Processes bank account events to generate views (balance and transaction history).
-- Queries API (Python, FastAPI): Serves read requests for projections.
+- **API Layer**: Provides distinct endpoints for operations
+  - Command API for account operations
+  - Query API for reading account state
+  - RESTful interface for client interactions
 
-TODO: [image]
+[Architecture Diagram Placeholder]
 
-## Project structure ##
+### Physical Architecture
+
+The system consists of five main components:
+
+1. **Core Bank API** (Java/Spring Boot)
+   - Handles command operations
+   - REST API interface
+   - Transaction initiation point
+
+2. **Bank Account Actor** (Java/Spring Boot)
+   - Processes atomic account operations
+   - Implements Dapr Actor pattern
+   - Maintains account consistency
+
+3. **Event Source** (Go/Gorilla Mux)
+   - Manages event distribution
+   - Integrates with ImmuDB for event storage
+   - Implements Dapr pubsub
+
+4. **Account Projections** (Python/FastAPI)
+   - Processes account events
+   - Generates view models
+
+5. **Queries API** (Python/FastAPI)
+   - Serves read requests
+   - Provides account views
+
+[Component Diagram Placeholder]
+
+## 📁 Project Structure
 
 ```
 core_banking_system_es_cqrs/
-├── aggregates/           # Bank account actor (Java)
-├── core_bank_api/        # Command API (Java)
-├── es/                   # Event Source (Go)
-├── libraries/            # Shared code for Java and Python projects
+├── aggregates/           # Bank account actor implementation (Java)
+├── core_bank_api/       # Command API service (Java)
+├── es/                  # Event Source service (Go)
+├── libraries/           # Shared utilities and common code
+│   ├── java/           # Java shared libraries
+│   └── python/         # Python shared libraries
 ├── projections/
-│   └── account/          # Account projections (Python)
-└── queries_bank_api/     # Query API (Python)
+│   └── account/        # Account projections service (Python)
+└── queries_bank_api/   # Query API service (Python)
 ```
 
-## Getting started ##
+## 🚀 Getting Started
 
-### Prerequisites ###
+### Prerequisites
 
-- An IDE for Java with Maven (I suggests IntelliJ IDEA)
-- Git
-- Docker 27.2.0 (Docker desktop for Windows)
-- Dapr 1.14.4 - Follow the instructions in the official documentation [here](https://docs.dapr.io/getting-started/install-dapr-cli/)
-- Java 21
-- Python 3.12
-- Go 1.23
-- Poetry 1.7.1 - Follow the instructions in the official documentation [here](https://python-poetry.org/docs/#installation)
-- immudbclient and immudbadmin binaries from [here] (https://github.com/codenotary/immudb/releases)
+- Docker Desktop 27.2.0+
+- Dapr CLI 1.14.4+ Follow the instructions in the official documentation [here](https://docs.dapr.io/getting-started/install-dapr-cli/)
+- Java Development Kit (JDK) 21
+- Python 3.12+
+- Go 1.23+
+- Poetry 1.7.1+
+- IDE with Maven support (recommended: IntelliJ IDEA)
+- ImmuDB tools v1.9.5 (immudbclient & immudbadmin) from [here](https://github.com/codenotary/immudb/releases)
 
-### Installation ###
+### Installation
 
-1- Clone the repository:
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/rzamoramx/core_banking_system_es_cqrs.git
+   cd core_banking_system_es_cqrs
+   ```
+
+2. **Setup docker containers**
+   ```bash
+   # Start MongoDB server
+   docker run -d --name mongodb-container -p 27017:27017 mongo:7.0
+
+   # Start ImmuDB server
+   docker run -d -it --name immudb -p 3322:3322 -p 9497:9497 codenotary/immudb:1.9.5
+   ```
+
+3. **Configure Dapr Components**
+   Disable all other components in the Dapr runtime, you can do it by changing its file names in the "components" folder (normally it is under .dapr directory in the user home path), for example, change pubsub.yaml to pubsub.yaml.disabled.
+
+   Create the following component configurations in your Dapr components directory:
+
+   `eventsource.yaml`:
+   ```yaml
+   apiVersion: dapr.io/v1alpha1
+   kind: Component
+   metadata:
+     name: eventsource
+   spec:
+     type: pubsub.redis
+     version: v1
+     metadata:
+     - name: redisHost
+       value: localhost:6379
+     - name: redisPassword
+       value: ""
+   ```
+
+   `statestore.yaml`:
+   ```yaml
+   apiVersion: dapr.io/v1alpha1
+   kind: Component
+   metadata:
+     name: statestore
+   spec:
+     type: state.redis
+     version: v1
+     metadata:
+     - name: redisHost
+       value: localhost:6379
+     - name: redisPassword
+       value: ""
+     - name: actorStateStore
+       value: "true"
+   ```
+
+4. **Setup ImmuDB**
+
+    For first time, Immudb prompts you to change the default password. Follow the instructions to set "immudb1" as the new password or whatever you prefer.
+   ```bash
+   ./immuadmin login immudb
+   ./immuadmin database create eventsourcedb
+   ./immuclient use eventstoredb
+   ```
+
+5. **Initialize MongoDB**
+    You can use a GUI like MongoDB Compass or a command line to create the required collections. Create a database named `mydb` and two collections named `balance` and `transactions`.
+
+6. **Build Shared Libraries**
+   ```bash
+   # Java libraries
+   cd libraries/java
+   mvn clean install
+
+   # Python libraries
+   cd ../python
+   poetry install
+   ```
+
+7. **Start Services**
+   Follow the individual README files in each service directory for specific startup instructions.
+    - Core Bank API [here](core_bank_api/README.md).
+
+    - Bank Account Actor [here](aggregates/README.md).
+
+    - Event Source [here](es/README.md).
+
+    - Account Projections [here](projections/account/README.md).
+
+    - Queries API [here](queries_bank_api/README.md).
+
+## 🔍 Usage
+
+### Create a Transaction
+
+You will see all components interacting with each other to process the transaction seeing the logs in each console.
 
 ```bash
-git clone https://github.com/rzamoramx/core_banking_system_es_cqrs.git
-cd core_banking_system_es_cqrs
+curl -X POST http://localhost:8081/mybank/api/v1/account/transaction \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "1234",
+    "amount": 100.00,
+    "transaction_type": "DEPOSIT"
+  }'
 ```
 
-2- Setup docker containers:
+### Check Account Balance
 
+Where 1234 is the account id you used in the previous request.
 ```bash
-docker run -d --name mongodb-container -p 27017:27017 mongo
-docker run -d -it --name immudb -p 3322:3322 -p 9497:9497 codenotary/immudb:latest
+curl -X GET http://localhost:8003/mybank/api/v1/account/1234/balance
 ```
 
-3- Configure Dapr components:
+### View Transaction History
 
-Disable all other components in the Dapr runtime, you can do it by changing its file names in the "components" folder (normally it is installed under .dapr directory in the user home path), for example, change pubsub.yaml to pubsub.yaml.disabled and then create the following files:
-
-evensource.yaml
-``` yaml
-apiVersion: dapr.io/v1alpha1
-kind: Component
-metadata:
-  name: eventsource
-spec:
-  type: pubsub.redis
-  version: v1
-  metadata:
-  - name: redisHost
-    value: localhost:6379
-  - name: redisPassword
-    value: ""
+Where 1234 is the account id you used in the previous request.
+```bash
+curl -X GET http://localhost:8003/mybank/api/v1/account/1234/history
 ```
 
-statestore.yaml
-``` yaml
-apiVersion: dapr.io/v1alpha1
-kind: Component
-metadata:
-  name: statestore
-spec:
-  type: state.redis
-  version: v1
-  metadata:
-  - name: redisHost
-    value: localhost:6379
-  - name: redisPassword
-    value: ""
-  - name: actorStateStore
-    value: "true"
-```
+## 🛠️ Technology Stack
 
-4- Setup immudb:
+- **Runtime**: 
+  - [Dapr](https://dapr.io/)
+- **Services**:
+  - Java/Spring Boot
+  - Python/FastAPI
+  - Go/Gorilla Mux
+- **Storage**:
+  - MongoDB (Projections)
+  - ImmuDB (Event Store)
+  - Redis (Dapr state store)
 
-You'll need the immuadmin and immuclient binaries, the commands are the same in Linux, Windows, and MacOS.
-
-``` bash
-./immuadmin login immudb
-... follow the instructions to change the password
-./immuadmin database create eventsourcedb
-./immuclient use eventstoredb
-```
-
-5- Create DB in mongodb:
-  
-  Create "mydb" database in mongo and "balance" and "transactions" collections. You can use a GUI like MongoDB Compass or a command line tool like mongo shell.
-
-6- Setup shared code libraries:
-
- - Java:
-    localate into libraries/java and execute the following command:
-  
-    ``` bash
-    mvn clean install
-    ```
-
-  - Python:
-    localate into libraries/python and execute the following command:
-  
-    ``` bash
-    poetry install
-    ```
-
-7- Follow the README instructions in each project subdirectory to set up and run individual components.
-  - For the Core Bank API (Java), follow the instructions in the [core_bank_api/README.md](core_bank_api/README.md).
-
-  - For the Bank Account Actor (Java), follow the instructions in the [aggregates/README.md](aggregates/README.md).
-
-  - For the Event Source (Go), follow the instructions in the [es/README.md](es/README.md).
-
-  - For the Account Projections (Python), follow the instructions in the [projections/account/README.md](projections/account/README.md).
-
-  - For the Queries API (Python), follow the instructions in the [queries_bank_api/README.md](queries_bank_api/README.md).
-
-
-## Usage ##
-
-Once all components are up and running, you can perform the following operations:
-
-1- Start a command operation by sending a POST request to the Core Bank API:
-  
-  ``` bash
-  curl -X POST http://localhost:8081/mybank/api/v1/account/transaction   -H "Content-Type: application/json" -d '{"account_id": "1234", "amount": 100.00, "transaction_type": "DEPOSIT"}'
-  ```
-
-  Response:
-  ``` json
-  {
-	"status": "OK",
-	"message": "Transaction created",
-	"data": null
-  }
-  ```
-
-  You will see all components interacting with each other to process the transaction seeing the logs in each console.
-
-2- Check the account balance by sending a GET request to the Queries API:
-
-  ``` bash
-  curl -X GET http://localhost:8003/mybank/api/v1/account/:accountid/balance
-  ```
-
-  Where :accountid is the account id you used in the previous request.
-
-  Response:
-  ``` json
-  {
-	"balance": 550,
-	"currency": "MXN",
-	"user_id": 1,
-	"username": "test_user",
-	"account_id": "A0003",
-	"created_at": "2024-10-11T08:15:09.776613",
-	"updated_at": "2024-10-11T08:16:14.187731"
-  }
-  ```
-
-3- Check the account transaction history by sending a GET request to the Queries API:
-
-  ``` bash
-  curl -X GET http://localhost:8003/mybank/api/v1/account/:accountid/history
-  ```
-
-  Where :accountid is the account id you used in the previous request.
-
-  Response:
-  ``` json
-  [
-	{
-		"id": "362c0b08-ee9f-4157-b0ea-9fbfc275ba88",
-		"account_id": "A0003",
-		"amount": 50.0,
-		"type": "DEPOSIT",
-		"status": "completed",
-		"description": "Transaction completed",
-		"timestamp": "2024-10-11T08:15:09",
-		"version": 1
-	},
-	{
-		"id": "500cbafd-f69f-40fa-95cf-d69e51e4ea64",
-		"account_id": "A0003",
-		"amount": 500.0,
-		"type": "DEPOSIT",
-		"status": "completed",
-		"description": "Transaction completed",
-		"timestamp": "2024-10-11T08:16:14",
-		"version": 1
-	}
-  ]
-  ```
-
-## Technologies Used ##
-
-- Dapr
-- Spring Boot
-- FastAPI
-- Gorilla/mux
-- MongoDB
-- ImmuDB
-
-## Contributing ##
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License ##
+1. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+2. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+3. Push to the branch (`git push origin feature/AmazingFeature`)
+4. Open a Pull Request
+
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments ##
+## 🙏 Acknowledgments
 
 - The Dapr community for their amazing work on building a powerful runtime for microservices.
+
+## 📚 Additional Resources
+
+- [Based on this blog post "A Core banking System Architecture"](https://sites.google.com/view/rodrigozamora/blog/arquitectura-para-un-core-banking-system?authuser=0) (in Spanish).
+- [Dapr Documentation](https://docs.dapr.io/)
+- [Event Sourcing Pattern](https://microservices.io/patterns/data/event-sourcing.html)
+- [CQRS Pattern](https://microservices.io/patterns/data/cqrs.html)

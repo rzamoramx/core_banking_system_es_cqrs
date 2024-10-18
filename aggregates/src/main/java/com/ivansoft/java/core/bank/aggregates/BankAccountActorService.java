@@ -36,10 +36,9 @@ public class BankAccountActorService {
         // Determines whether to drain API calls for actors instances being balanced.
         ActorRuntime.getInstance().getConfig().setDrainBalancedActors(true);
 
-        // Register the Actor class.
+        // Register the Actor class in Dapr runtime.
         ActorRuntime.getInstance().registerActor(BankAccountActorImpl.class);
 
-        // Start Dapr's callback endpoint.
         AggregatesApplication.start(port);
     }
 }
