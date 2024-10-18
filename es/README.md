@@ -21,7 +21,6 @@ The Event Source service manages the event lifecycle:
 - **Event Reception**: Receives events through Dapr pub/sub
 - **Persistence**: Stores events in ImmuDB's immutable ledger
 - **Distribution**: Forwards events to interested subscribers
-- [TODO] **Retrieval**: Provides API for historical event access
 
 ### System Integration Flow
 

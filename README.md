@@ -79,6 +79,77 @@ The system consists of five main components:
 
 [Component Diagram Placeholder]
 
+### Data Flow Architecture
+
+The system processes transactions through the following flow:
+
+1. **Command Flow**:
+   - Client sends transaction request to Command API
+   - Command API validates basic request structure
+   - Bank Account Actor processes transaction
+   - Actor generates and publishes domain events
+   - Event Source stores events in ImmuDB
+   - Events are published to projection services
+
+2. **Query Flow**:
+   - Client requests account information from Query API
+   - Query API retrieves projected state from MongoDB
+   - Projected state reflects all processed events up to that point
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant CommandAPI
+    participant BankActor
+    participant EventSource
+    participant Projector
+    participant QueryAPI
+
+    Client->>CommandAPI: POST /transaction
+    CommandAPI->>BankActor: Process Transaction
+    BankActor->>EventSource: Publish Event
+    EventSource->>Projector: Project Event
+    Projector->>Projector: Update View Model
+    Client->>QueryAPI: GET /balance
+    QueryAPI->>Projector: Read Current State
+    Projector->>QueryAPI: Return Balance
+    QueryAPI->>Client: Return Response
+```
+
+## ⚖️ Architecture Trade-offs
+
+### Advantages
+
+1. **Event Sourcing**:
+   - Complete audit trail
+   - Temporal query capability
+   - State reconstruction
+   - Debug capability
+
+2. **CQRS**:
+   - Optimized read/write operations
+   - Independent scaling
+   - Query flexibility
+
+### Limitations
+
+1. **Complexity**:
+   - More complex than CRUD
+   - Learning curve for developers
+   - Additional infrastructure needed
+
+2. **Eventual Consistency**:
+   - Read queries may be stale
+   - Complex compensation logic
+   - Harder to reason about system state
+
+### Ideal Use Cases
+
+- High audit requirements
+- Complex business rules
+- High read/write ratio difference
+- Regulatory compliance needs
+
 ## 📁 Project Structure
 
 ```
@@ -249,6 +320,26 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 2. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 3. Push to the branch (`git push origin feature/AmazingFeature`)
 4. Open a Pull Request
+
+
+## 🎯 Roadmap
+
+- [ ] **Compensation commands**: Implement compensating transactions for failed operations (sagas)
+- [ ] **Security**: Add authentication and authorization to APIs
+
+### Event Source
+
+- [ ] **Retrieval**: Provides API for historical event access
+- [ ] **Auditing**: Implements event verification and auditing
+
+### Aggregates
+
+- [ ] **Rewind capability**: Supports event replay for state reconstruction
+
+### Querying API
+
+- [ ] **Pagination**: Adds pagination support for large result sets
+- [ ] **Chaching**: Implements caching for improved performance
 
 ## 📝 License
 

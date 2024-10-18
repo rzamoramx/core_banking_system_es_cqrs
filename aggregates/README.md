@@ -28,8 +28,23 @@ Each bank account is modeled as a Dapr Actor, providing:
 graph LR
     A[Command API] --> B[Account Actor]
     B --> C[Business Rules]
-    C --> D[Event Generation]
+    C --> D[Update State]
+    D --> E[Event Generation]
     style B fill:#f9f,stroke:#333,stroke-width:4px
+```
+
+## State Management
+
+```mermaid
+stateDiagram-v2
+    [*] --> Active: Actor Activation
+    Active --> Processing: Transaction Request
+    Processing --> ValidationFailed: Invalid Transaction
+    Processing --> StateUpdated: Valid Transaction
+    StateUpdated --> EventPublished: Publish Event
+    ValidationFailed --> Active: Return Error
+    EventPublished --> Active: Transaction Complete
+    Active --> [*]: Actor Deactivation
 ```
 
 ## 🚀 Setup
@@ -106,7 +121,7 @@ public class BankAccountActorService {
 
 ### Business Rules
 
-The aggregate enforces several business rules:
+The aggregate enforces business rules:
 - Minimum balance requirements
 - [TODO] Transaction limits
 - [TODO] Account status validation
