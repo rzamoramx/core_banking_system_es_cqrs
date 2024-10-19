@@ -39,7 +39,6 @@ The system is built around these core components:
   - Supports balance and transaction history queries
 
 - **Event Source**: Serves as the system's backbone
-  - Manages event flow between commands and queries
   - Ensures event persistence and distribution
   - Maintains the source of truth for all transactions
 
@@ -48,7 +47,62 @@ The system is built around these core components:
   - Query API for reading account state
   - RESTful interface for client interactions
 
-[Architecture Diagram Placeholder]
+```mermaid
+graph TB
+    Client[Client]
+    
+    subgraph API["API Layer"]
+        CommandAPI["Command API<br/>(Operaciones)"]
+        QueryAPI["Query API<br/>(Consultas)"]
+    end
+    
+    subgraph CommandLayer["Command Layer"]
+        direction TB
+        Aggregates["Account Aggregates"]
+        BusinessRules["Business Rules<br/>Validation"]
+        Operations["Banking Operations<br/>(Deposits/Withdrawals)"]
+    end
+    
+    subgraph QueryLayer["Query Layer"]
+        direction TB
+        ReadModels["Read Models"]
+        Projections["Projections"]
+        QueryOps["Query Operations<br/>(Balance/History)"]
+    end
+    
+    subgraph EventSource["Event Source"]
+        EventStore["Event Store"]
+        EventBus["Event Bus"]
+    end
+    
+    %% Conexiones del Cliente
+    Client --> CommandAPI
+    Client --> QueryAPI
+    
+    %% Conexiones de la API
+    CommandAPI --> CommandLayer
+    QueryAPI --> QueryLayer
+    
+    %% Conexiones del Command Layer
+    CommandLayer --> EventSource
+    Aggregates --> BusinessRules
+    BusinessRules --> Operations
+    
+    %% Conexiones del Query Layer
+    EventSource --> QueryLayer
+    ReadModels --> Projections
+    Projections --> QueryOps
+    
+    %% Conexiones del Event Source
+    EventStore --> EventBus
+    
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:2px
+    classDef layer fill:#e4f0f5,stroke:#333,stroke-width:2px
+    classDef source fill:#f5e6e4,stroke:#333,stroke-width:2px
+    
+    class API,CommandLayer,QueryLayer layer
+    class EventSource source
+```
 
 ### Physical Architecture
 
@@ -77,7 +131,45 @@ The system consists of five main components:
    - Serves read requests
    - Provides account views
 
-[Component Diagram Placeholder]
+```mermaid
+graph TB
+    subgraph "Banking System"
+        API[Core Bank API<br/>Java/Spring Boot] 
+        ACTOR[Bank Account Actor<br/>Java/Spring Boot]
+        EVENT[Event Source<br/>Go/Gorilla Mux]
+        PROJ[Account Projections<br/>Python/FastAPI]
+        QUERY[Queries API<br/>Python/FastAPI]
+
+        %% Node styles
+        class API,ACTOR,EVENT,PROJ,QUERY nodeStyle;
+        
+        %% Connections
+        API -->|"Commands"| ACTOR
+        ACTOR -->|"Events"| EVENT
+        EVENT -->|"Event publishing"| PROJ
+        PROJ -->|"Updates views"| QUERY
+        
+        %% Styling
+        classDef nodeStyle fill:#f9f,stroke:#333,stroke-width:2px;
+    end
+
+    %% Notes for each component
+    subgraph "Responsibilities"
+        style Responsibilities fill:#f0f0f0,stroke:#333
+        
+        API_NOTE[/"- Handles command operations<br/>- REST API interface<br/>- Transaction initiation point"/]
+        ACTOR_NOTE[/"- Processes atomic account operations<br/>- Implements Dapr Actor pattern<br/>- Maintains account consistency"/]
+        EVENT_NOTE[/"- Manages event distribution<br/>- Integrates with ImmuDB<br/>- Implements Dapr pubsub"/]
+        PROJ_NOTE[/"- Processes account events<br/>- Generates view models"/]
+        QUERY_NOTE[/"- Serves read requests<br/>- Provides account views"/]
+        
+        API --- API_NOTE
+        ACTOR --- ACTOR_NOTE
+        EVENT --- EVENT_NOTE
+        PROJ --- PROJ_NOTE
+        QUERY --- QUERY_NOTE
+    end
+```
 
 ### Data Flow Architecture
 
