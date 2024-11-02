@@ -20,6 +20,7 @@
 		<lombok.version>1.18.30</lombok.version>
 		<commons.cli.version>1.6.0</commons.cli.version>
 		<core.bank.version>1.0.5</core.bank.version>
+		<reactor.test.version>3.6.3</reactor.test.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -69,6 +70,14 @@
 			<groupId>com.ivansoft.core.bank</groupId>
 			<artifactId>common_lib</artifactId>
 			<version>${core.bank.version}</version>
+		</dependency>
+
+		<!-- Reactor Test for testing reactive streams -->
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<version>${reactor.test.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
