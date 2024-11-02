@@ -4,14 +4,34 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
+	"github.com/codenotary/immudb/pkg/api/schema"
 	immudb "github.com/codenotary/immudb/pkg/client"
 	"ivansoft.com/corebank/eventsource/store/models"
 )
 
+// ImmuClientInterface defines only the methods we actually use, this is useful for mocking
+type ImmuClientInterface interface {
+	OpenSession(ctx context.Context, user []byte, pass []byte, database string) error
+	CloseSession(ctx context.Context) error
+	VerifiedGet(ctx context.Context, key []byte, opts ...immudb.GetOption) (*schema.Entry, error)
+	VerifiedSet(ctx context.Context, key []byte, value []byte) (*schema.TxHeader, error)
+	WithOptions(options *immudb.Options) ImmuClientInterface
+}
+
 type Immudb struct {
+	Client ImmuClientInterface //immudb.ImmuClient
+	Ctx    context.Context
+}
+
+// ImmuClientWrapper wraps the immudb.ImmuClient to implement the ImmuClientInterface
+type ImmuClientWrapper struct {
 	client immudb.ImmuClient
-	ctx    context.Context
+}
+
+func NewImmuClientWrapper(client immudb.ImmuClient) ImmuClientInterface {
+	return &ImmuClientWrapper{client: client}
 }
 
 func NewImmudb(host string,
@@ -24,22 +44,45 @@ func NewImmudb(host string,
 		WithAddress(host).
 		WithPort(port)
 
-	client := immudb.NewClient().WithOptions(opts)
+	realClient := immudb.NewClient().WithOptions(opts)
+	wrappedClient := NewImmuClientWrapper(realClient)
+
+	err := wrappedClient.OpenSession(ctx, []byte(user), []byte(pwd), database)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open session: %v", err)
+	}
+
+	return &Immudb{
+		Client: wrappedClient,
+		Ctx:    ctx,
+	}, nil
+
+	/*client := immudb.NewClient().WithOptions(opts)
+
 	err := openSession(ctx, client, user, pwd, database)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open session: %v", err)
 	}
 
 	return &Immudb{
-		client: client,
-		ctx:    ctx,
-	}, nil
+		Client: client,
+		Ctx:    ctx,
+	}, nil*/
 }
 
 func (cl *Immudb) Get(req *models.GetRequest) (*models.GetResponse, error) {
-	entry, err := cl.client.VerifiedGet(cl.ctx, []byte(req.Key))
+	entry, err := cl.Client.VerifiedGet(cl.Ctx, []byte(req.Key))
 	if err != nil {
+		if strings.Contains(err.Error(), "key not found") {
+			return nil, nil
+		}
+
 		return nil, fmt.Errorf("failed to get value: %v", err)
+	}
+
+	// Ensure the entry is not nil
+	if entry == nil {
+		return nil, fmt.Errorf("entry is nil")
 	}
 
 	return &models.GetResponse{
@@ -62,7 +105,7 @@ func (cl *Immudb) Set(req *models.SetRequest) (int, error) {
 		}
 	}
 
-	tx, err := cl.client.VerifiedSet(cl.ctx, []byte(req.Key), b)
+	tx, err := cl.Client.VerifiedSet(cl.Ctx, []byte(req.Key), b)
 	if err != nil {
 		return 0, fmt.Errorf("failed to set value: %v", err)
 	}
@@ -89,10 +132,30 @@ func (cl *Immudb) GetEvent(accountId string) ([]byte, error) {
 }
 
 func (cl *Immudb) Close() error {
-	return cl.client.CloseSession(cl.ctx)
+	return cl.Client.CloseSession(cl.Ctx)
 }
 
-func openSession(ctx context.Context,
+func (w *ImmuClientWrapper) OpenSession(ctx context.Context, user []byte, pass []byte, database string) error {
+	return w.client.OpenSession(ctx, user, pass, database)
+}
+
+func (w *ImmuClientWrapper) CloseSession(ctx context.Context) error {
+	return w.client.CloseSession(ctx)
+}
+
+func (w *ImmuClientWrapper) VerifiedGet(ctx context.Context, key []byte, opts ...immudb.GetOption) (*schema.Entry, error) {
+	return w.client.VerifiedGet(ctx, key, opts...)
+}
+
+func (w *ImmuClientWrapper) VerifiedSet(ctx context.Context, key []byte, value []byte) (*schema.TxHeader, error) {
+	return w.client.VerifiedSet(ctx, key, value)
+}
+
+func (w *ImmuClientWrapper) WithOptions(options *immudb.Options) ImmuClientInterface {
+	return NewImmuClientWrapper(w.client.WithOptions(options))
+}
+
+/*func openSession(ctx context.Context,
 	client immudb.ImmuClient,
 	user string,
 	pwd string,
@@ -103,4 +166,4 @@ func openSession(ctx context.Context,
 		[]byte(pwd),
 		database,
 	)
-}
+}*/
