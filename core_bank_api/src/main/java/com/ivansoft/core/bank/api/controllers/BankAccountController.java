@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.logging.Logger;
 import com.ivansoft.core.bank.api.actors.BankAccountActorClient;
 
-
 @RestController
 @RequestMapping("/mybank/api/v1/account")
 public class BankAccountController {
@@ -18,6 +17,11 @@ public class BankAccountController {
 
     @PostMapping("/transaction")
     public Response createTransaction(@RequestBody RequestAccountTransaction requestAccountTransaction) {
+        if (requestAccountTransaction == null) {
+            log.severe("Request body is null");
+            return new Response("ERROR", "Error creating transaction", null);
+        }
+
         log.info("Creating transaction for account " + requestAccountTransaction.getAccountId() + " with type " +
                 requestAccountTransaction.getTransactionType() + " and amount " + requestAccountTransaction.getAmount());
         try {

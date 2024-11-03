@@ -15,3 +15,10 @@ class TransactionRepository:
         to_save = json.loads(transaction.model_dump_json())
         logger.info('Saving transaction', balance=transaction)
         await TransactionRepository._client[MONGO_DB_NAME][MONGO_TRANSACTION_COLLECTION].insert_one(to_save)
+
+    async def get_by_account_id(self, account_id: str) -> [TransactionModel]:
+        logger.info('Getting transactions by account_id', account_id=account_id)
+        transactions = []
+        async for transaction in TransactionRepository._client[MONGO_DB_NAME][MONGO_TRANSACTION_COLLECTION].find({"account_id": account_id}):
+            transactions.append(TransactionModel(**transaction))
+        return transactions
