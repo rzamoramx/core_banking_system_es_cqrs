@@ -114,7 +114,8 @@ func loadConfig() (*Config, error) {
 }
 
 func loadConfigToEnv() error {
-	if os.Getenv("ENV") == "dev" {
+	// if not set ENV variable, by default use config-dev.json, otherwise use environment variables
+	if os.Getenv("ENV") == "" || os.Getenv("ENV") == "dev" {
 		config, err := loadConfig()
 		if err != nil {
 			return fmt.Errorf("failed to load config: %w", err)

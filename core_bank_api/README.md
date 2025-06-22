@@ -123,7 +123,7 @@ The API uses standard HTTP status codes and provides detailed error messages:
 
 ## 🐛 Troubleshooting
 
-Common issues and solutions:
+Issues and solutions:
 
 1. **Service Not Starting**
    ```bash
@@ -134,6 +134,10 @@ Common issues and solutions:
    - Verify Bank Account Actor service is running
    - Check Dapr configuration
    - Validate network connectivity
+
+3. **In terminal cannot run bacause common lib cannot locate**
+   - Ensure common library is installed and available in the classpath
+      You can run clean and install of common library and clean package of this service from Intellij mvn panel
 
 ## 🔍 Monitoring
 
