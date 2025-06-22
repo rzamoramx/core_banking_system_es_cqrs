@@ -6,6 +6,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)](https://www.mongodb.com/)
 
 The queries_bank_api service provides a RESTful API for querying account balances and transaction history. It reads from the MongoDB projections created by the account_projections service, enabling efficient reads in a CQRS-based architecture.
+Any clients can use this service to retrieve account information without needing to interact with the command side of the system.
 
 - Implements read queries for account balances and transaction history.
 - FastAPI framework for fast, asynchronous API handling.

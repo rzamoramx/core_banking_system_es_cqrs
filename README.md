@@ -262,13 +262,12 @@ core_banking_system_es_cqrs/
 ### Prerequisites
 
 - Docker Desktop 27.2.0+
-- Dapr CLI 1.14.4+ Follow the instructions in the official documentation [here](https://docs.dapr.io/getting-started/install-dapr-cli/)
+- Dapr CLI 1.14.4+ Follow the instructions in the official documentation [here](https://docs.dapr.io/getting-started/install-dapr-cli/) don't forget run "dapr init" to initialize
 - Java Development Kit (JDK) 21
 - Python 3.12+
-- Go 1.23+
-- Poetry 1.7.1+
+- Go 1.24+
+- Poetry 2.1.3+
 - IDE with Maven support (recommended: IntelliJ IDEA)
-- ImmuDB tools v1.9.5 (immudbclient & immudbadmin) from [here](https://github.com/codenotary/immudb/releases)
 
 ### Installation
 
@@ -326,26 +325,33 @@ core_banking_system_es_cqrs/
        value: "true"
    ```
 
-4. **Setup ImmuDB**
+4. **Check ImmuDB**
 
-    For first time, Immudb prompts you to change the default password. Follow the instructions to set "immudb1" as the new password or whatever you prefer.
+   Run the Immudb client container with the following command:
    ```bash
-   ./immuadmin login immudb
-   ./immuadmin database create eventsourcedb
-   ./immuclient use eventstoredb
+   docker run -it --rm --net host --name immuclient codenotary/immuclient:latest
+   ```
+    
+   And log in (default user: immudb, default password: immudb)
+   
+   ```bash
+   login immudb
+   set balance 20
+   get balance
    ```
 
 5. **Initialize MongoDB**
-    You can use a GUI like MongoDB Compass or a command line to create the required collections. Create a database named `mydb` and two collections named `balance` and `transactions`.
+    You can use a GUI like MongoDB Compass or a commaChend line to create the required collections. Create a database named `mydb` and two collections named `balance` and `transactions`.
 
 6. **Build Shared Libraries**
    ```bash
    # Java libraries
-   cd libraries/java
+   cd libraries/java/common_lib
    mvn clean install
 
    # Python libraries
-   cd ../python
+   # see notes section below
+   cd libraries/python/com-ivansoft-corebank-lib
    poetry install
    ```
 
@@ -447,3 +453,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Dapr Documentation](https://docs.dapr.io/)
 - [Event Sourcing Pattern](https://microservices.io/patterns/data/event-sourcing.html)
 - [CQRS Pattern](https://microservices.io/patterns/data/cqrs.html)
+
+
+## NOTES
+
+- If you want to run python components inside IDE, you must configure Poetry venv and then run each commands- If you want to run Python components within the IDE, you must configure Poetry venv and then run each command within the IDE terminal.

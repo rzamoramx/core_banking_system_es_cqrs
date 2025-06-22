@@ -11,8 +11,10 @@ app.include_router(account_handler, prefix="/mybank/api/v1")
 async def ping():
     return {"message": "pong"}
 
-
-if __name__ == "__main__":
+def main():
     import uvicorn
     print('Running queries bank api on port 8003')
     uvicorn.run(app, host="0.0.0.0", port=8003)
+
+if __name__ == "__main__":
+    main()

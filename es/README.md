@@ -36,7 +36,9 @@ graph LR
 
 ### Prerequisites
 
-1. Add Immudb parameters connnection in config-dev.json file, use the password that you previously set up in the Installation section point 4 of the [README.md](../README.md) file.
+1. You can add parameters for connecting to Immudb in the config-dev.json file if you've changed the username, password, or database; otherwise, you don't need to change anything.
+
+You can use the Immudb client to see how banking transactions persist; point 4 of the [README.md](../README.md) file. See the official documentation for manipulating Immudb [here](https://docs.immudb.io/master/connecting/clitools.html#immuclient)
 
 ### Install dependencies
 

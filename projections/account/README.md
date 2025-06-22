@@ -34,9 +34,12 @@ graph LR
 
 1. **Verify Python Installation**
    ```bash
-   python --version  # Should be 3.12
-   poetry --version # Should be 1.7.1
+   python --version  # Should be 3.12 or higher
+   poetry --version # Should be 2.1.3 or higher
    ```
+   Also you must have installed library located in `core_banking_system_es_cqrs/libraries/python/com-ivansoft-corebank-lib`
+   Check the [README](../../README.md) for installation instructions.
+
 
 2. **Verify MongoDB**
    ```bash
