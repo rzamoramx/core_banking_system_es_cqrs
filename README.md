@@ -267,7 +267,7 @@ core_banking_system_es_cqrs/
 - Python 3.12+
 - Go 1.24+
 - Poetry 2.1.3+
-- IDE with Maven support (recommended: IntelliJ IDEA)
+- IDE with Maven support (recommended: IntelliJ IDEA) optional if you want to see the code
 
 ### Installation
 
@@ -332,8 +332,7 @@ core_banking_system_es_cqrs/
    docker run -it --rm --net host --name immuclient codenotary/immuclient:latest
    ```
     
-   And log in (default user: immudb, default password: immudb)
-   
+   And log in (default user: immudb, default password: immudb) you can use the client commands to interact with the ImmuDB instance
    ```bash
    login immudb
    set balance 20
@@ -457,4 +456,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## NOTES
 
-- If you want to run python components inside IDE, you must configure Poetry venv and then run each commands- If you want to run Python components within the IDE, you must configure Poetry venv and then run each command within the IDE terminal.
+- For Python components if you want to run them within IDE, you must configure Poetry venv and then run each command within the IDE terminal. 
