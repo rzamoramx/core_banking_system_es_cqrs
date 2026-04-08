@@ -3,7 +3,10 @@ package com.ivansoft.core.bank.account.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +22,10 @@ public class Transaction {
     private int version;
 
     public String convertToJson() {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String timestampStr = isoFormat.format(timestamp);
+
         return "{"
                 + "\"id\":\"" + id + "\","
                 + "\"account_id\":\"" + accountId + "\","
@@ -26,7 +33,7 @@ public class Transaction {
                 + "\"type\":\"" + type + "\","
                 + "\"status\":\"" + status + "\","
                 + "\"description\":\"" + description + "\","
-                + "\"timestamp\":\"" + timestamp + "\","
+                + "\"timestamp\":\"" + timestampStr + "\","
                 + "\"version\":" + version
                 + "}";
     }

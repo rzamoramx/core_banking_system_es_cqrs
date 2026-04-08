@@ -54,6 +54,18 @@ You can use the Immudb client to see how banking transactions persist; point 4 o
 
 ## 🏃‍♂️ Running the Service
 
+### Docker Mode
+
+You can build and run this component using Docker individually:
+
+```bash
+cd ../ # Go to the root of the repository
+docker build -t mybank/event_source -f es/Dockerfile .
+docker run -p 8002:8002 mybank/event_source
+```
+
+> **_NOTE:_** Running the component individually via Docker will not connect it to Dapr automatically. Use Docker Compose from the root directory to run the full Dapr mesh.
+
 ### Development Mode
 
 ```bash

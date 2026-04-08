@@ -24,15 +24,27 @@ class Transaction(BaseModel):
     @classmethod
     def parse_date(cls, value: Any) -> datetime:
         if isinstance(value, str):
+            # First try ISO format
             try:
-                # Try to parse the date with the format of the date in the database
-                return datetime.strptime(value, '%a %b %d %H:%M:%S CST %Y')
+                return datetime.fromisoformat(value.replace('Z', '+00:00'))
             except ValueError:
-                # if the date is not in the database format, try to parse it as an ISO date
-                try:
-                    return datetime.fromisoformat(value)
-                except ValueError:
-                    raise ValueError(f"Invalid date format: {value}")
+                pass
+
+            # Try common Java toString() formats (e.g., Wed Apr 08 17:26:53 UTC 2026)
+            # We try to parse the bits we know and ignore the timezone string if it's not CST
+            try:
+                # Format: %a %b %d %H:%M:%S %Z %Y
+                # Strptime %Z is sometimes problematic, so we try a few common patterns
+                for tz in ['UTC', 'CST', 'GMT', 'EST', 'PST']:
+                    try:
+                        return datetime.strptime(value, f'%a %b %d %H:%M:%S {tz} %Y')
+                    except ValueError:
+                        continue
+                
+                # If still failing, it might be an ISO-like format without separators or something else
+                raise ValueError(f"No matching format for date string: {value}")
+            except Exception as e:
+                raise ValueError(f"Invalid date format: {value}. Error: {str(e)}")
         elif isinstance(value, datetime):
             return value
         raise ValueError(f"Invalid date type: {type(value)}")

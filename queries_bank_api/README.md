@@ -58,6 +58,18 @@ graph LR
 
 ## 🏃‍♂️ Running the Service
 
+### Docker Mode
+
+You can build and run this component using Docker individually:
+
+```bash
+cd ../ # Go to the root of the repository
+docker build -t mybank/queries_bank_api -f queries_bank_api/Dockerfile .
+docker run -p 8003:8003 mybank/queries_bank_api
+```
+
+> **_NOTE:_** Running the component individually via Docker will not connect it to Dapr automatically. Use Docker Compose from the root directory to run the full Dapr mesh.
+
 ### Development Mode
 
 ```bash

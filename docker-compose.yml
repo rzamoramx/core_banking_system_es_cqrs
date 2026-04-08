@@ -1,0 +1,188 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # INFRASTRUCTURE SERVICES
+  # ----------------------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+
+  immudb:
+    image: codenotary/immudb:1.9.5
+    container_name: immudb
+    ports:
+      - "3322:3322"
+      - "9497:9497"
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1s bash -c ':> /dev/tcp/127.0.0.1/3322' || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    # Port exposed as 6380 to avoid conflict with Dapr's built-in Redis on 6379
+    ports:
+      - "6380:6379"
+
+  placement:
+    image: daprio/dapr:1.14.4
+    container_name: dapr-placement
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+
+  # ----------------------------------------------------------------------------
+  # CORE BANKING MICROSERVICES AND DAPR SIDECARS
+  # ----------------------------------------------------------------------------
+
+  # 1. Bank Account Actor
+  bank_account_actor:
+    build:
+      context: .
+      dockerfile: aggregates/Dockerfile
+    container_name: bank_account_actor
+    depends_on:
+      - redis
+      - placement
+
+  bank_account_actor-dapr:
+    image: daprio/daprd:1.14.4
+    container_name: bank_account_actor-dapr
+    network_mode: "service:bank_account_actor"
+    command: [
+      "./daprd", 
+      "-app-id", "bankaccountactorservice", 
+      "-app-port", "3000", 
+      "-components-path", "/components", 
+      "-placement-host-address", "placement:50006"
+    ]
+    volumes:
+      - ./dapr-components:/components
+    depends_on:
+      - bank_account_actor
+
+  # 2. Core Bank API
+  core_bank_api:
+    build:
+      context: .
+      dockerfile: core_bank_api/Dockerfile
+    container_name: core_bank_api
+    depends_on:
+      - bank_account_actor
+    ports:
+      - "8081:8081"   # App exposed port
+
+  core_bank_api-dapr:
+    image: daprio/daprd:1.14.4
+    container_name: core_bank_api-dapr
+    network_mode: "service:core_bank_api"
+    command: [
+      "./daprd", 
+      "-app-id", "corebankapi", 
+      "-app-port", "8081", 
+      "-components-path", "/components", 
+      "-placement-host-address", "placement:50006"
+    ]
+    volumes:
+      - ./dapr-components:/components
+    depends_on:
+      - core_bank_api
+
+  # 3. Event Source
+  event_source:
+    build:
+      context: .
+      dockerfile: es/Dockerfile
+    container_name: event_source
+    depends_on:
+      redis:
+        condition: service_started
+      immudb:
+        condition: service_healthy
+    environment:
+      - ENV=dockerized
+      - IMMUDB_HOST=immudb
+      - IMMUDB_PORT=3322
+      - IMMUDB_USER=immudb
+      - IMMUDB_PASSWORD=immudb
+      - IMMUDB_DATABASE=defaultdb
+
+  event_source-dapr:
+    image: daprio/daprd:1.14.4
+    container_name: event_source-dapr
+    network_mode: "service:event_source"
+    command: [
+      "./daprd",
+      "-app-id", "eventsourcestore",
+      "-app-port", "8002",
+      "-components-path", "/components",
+      "-placement-host-address", "placement:50006"
+    ]
+    volumes:
+      - ./dapr-components:/components
+    depends_on:
+      - event_source
+
+  # 4. Account Projections
+  account_projections:
+    build:
+      context: .
+      dockerfile: projections/account/Dockerfile
+    container_name: account_projections
+    depends_on:
+      - redis
+      - mongodb
+    environment:
+      - MONGO_HOST=mongodb
+
+  account_projections-dapr:
+    image: daprio/daprd:1.14.4
+    container_name: account_projections-dapr
+    network_mode: "service:account_projections"
+    command: [
+      "./daprd",
+      "-app-id", "accountprojections",
+      "-app-port", "8000",
+      "-components-path", "/components",
+      "-placement-host-address", "placement:50006"
+    ]
+    volumes:
+      - ./dapr-components:/components
+    depends_on:
+      - account_projections
+
+  # 5. Queries Bank API
+  queries_bank_api:
+    build:
+      context: .
+      dockerfile: queries_bank_api/Dockerfile
+    container_name: queries_bank_api
+    depends_on:
+      - mongodb
+      - account_projections
+    ports:
+      - "8003:8003"   # Queries App port
+    environment:
+      - MONGO_HOST=mongodb
+
+  queries_bank_api-dapr:
+    image: daprio/daprd:1.14.4
+    container_name: queries_bank_api-dapr
+    network_mode: "service:queries_bank_api"
+    command: [
+      "./daprd",
+      "-app-id", "queriesbankapi",
+      "-app-port", "8003",
+      "-components-path", "/components",
+      "-placement-host-address", "placement:50006"
+    ]
+    volumes:
+      - ./dapr-components:/components
+    depends_on:
+      - queries_bank_api

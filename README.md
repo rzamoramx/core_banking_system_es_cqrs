@@ -259,6 +259,16 @@ core_banking_system_es_cqrs/
 
 ## 🚀 Getting Started
 
+### Run with Docker Compose
+
+To start the entire infrastructure (MongoDB, ImmuDB, Redis, Dapr) alongside all five microservices and their Dapr sidecars in a single command, you can use Docker Compose from the root directory:
+
+```bash
+docker-compose up --build -d
+```
+
+This is the easiest and recommended way to launch the complete ES-CQRS architecture and have everything automatically communicating via the configured Dapr mesh.
+
 ### Prerequisites
 
 - Docker Desktop 27.2.0+

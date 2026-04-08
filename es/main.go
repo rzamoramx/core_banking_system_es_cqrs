@@ -10,6 +10,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -37,10 +38,24 @@ func main() {
 	appPort := flag.String("port", "6005", "Port for the application to listen on")
 	flag.Parse()
 
-	// Create Immudb client
-	immudbClient, err := createDbClient()
+	// Create Immudb client with retry logic
+	var immudbClient *db.Immudb
+	var err error
+	maxRetries := 10
+	for i := 1; i <= maxRetries; i++ {
+		immudbClient, err = createDbClient()
+		if err == nil {
+			break
+		}
+		log.Printf("Failed to connect to Immudb (attempt %d/%d): %v", i, maxRetries, err)
+		if i < maxRetries {
+			log.Printf("Retrying in 5 seconds...")
+			time.Sleep(5 * time.Second)
+		}
+	}
+
 	if err != nil {
-		log.Fatalf("Failed to create Immudb client: %v", err)
+		log.Fatalf("Failed to create Immudb client after %d attempts: %v", maxRetries, err)
 	}
 	defer immudbClient.Close()
 

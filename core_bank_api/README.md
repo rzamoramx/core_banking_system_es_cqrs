@@ -66,6 +66,18 @@ The service follows REST best practices:
 
 ## 🏃‍♂️ Running the Service
 
+### Docker Mode
+
+You can build and run this component using Docker individually. Since it relies on the shared Java library, it must be built from the root of the repository:
+
+```bash
+cd ../ # Go to the root of the repository
+docker build -t mybank/core_bank_api -f core_bank_api/Dockerfile .
+docker run -p 8081:8081 mybank/core_bank_api
+```
+
+> **_NOTE:_** Running the component individually via Docker will not connect it to Dapr automatically. Use Docker Compose from the root directory to run the full Dapr mesh.
+
 ### Development Mode
 
 ```bash
